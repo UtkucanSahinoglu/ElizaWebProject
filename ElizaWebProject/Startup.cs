@@ -29,6 +29,11 @@ namespace ElizaWebProject
             services.AddRazorPages();
             services.AddDbContext<ElizaDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("ElizaConnectionString")));
             services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ElizaDbContext>();
+
+            services.ConfigureApplicationCookie(config =>
+            {
+                config.LogoutPath = "/Login";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
