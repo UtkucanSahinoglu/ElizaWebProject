@@ -32,7 +32,7 @@ namespace ElizaWebProject
 
             services.ConfigureApplicationCookie(config =>
             {
-                config.LogoutPath = "/Login";
+                config.LoginPath = "/Login";
             });
         }
 
@@ -51,6 +51,8 @@ namespace ElizaWebProject
             }
 
             app.UseHttpsRedirection();
+
+
             app.UseStaticFiles();
 
             app.UseRouting();

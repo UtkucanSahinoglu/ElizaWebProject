@@ -21,12 +21,12 @@ namespace ElizaWebProject.Pages
         public async Task<IActionResult> OnPostLogoutAsync()
         {
             await signInManager.SignOutAsync();
-            return RedirectToPage("Login");
+            return RedirectToPage("/Login");
         }
 
         public IActionResult OnPostDontLogoutAsync()
         {
-            return RedirectToPage("Index");
+            return RedirectToPage("/Index");
         }
 
     }

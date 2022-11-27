@@ -16,7 +16,7 @@ namespace ElizaWebProject.Pages
 
         public PrivacyModel(ILogger<PrivacyModel> logger)
         {
-            _logger = logger;
+           _logger = logger;
         }
 
         public void OnGet()
