@@ -1,8 +1,11 @@
 using ElizaWebProject.Model;
+using ElizaWebProject.Services;
+using ElizaWebProject.ViewModels;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +37,36 @@ namespace ElizaWebProject
             {
                 config.LoginPath = "/Login";
             });
+
+            services.AddRouting(r => {
+                r.ConstraintMap.Add("slugify", typeof(SlugifyParameterTransformer));
+                r.LowercaseQueryStrings = true;
+                r.LowercaseUrls = true;
+            });
+
+            services.AddRazorPages(c =>
+            {
+                c.Conventions.AddPageRouteModelConvention("/ViewEvent", mc =>
+                {
+                    var allSelectors = new List<SelectorModel>
+                    {
+                        mc.Selectors[0]
+                    };
+                    mc.Selectors.Clear();
+                    mc.Selectors.Add(new SelectorModel(allSelectors[0])
+                    {
+                        AttributeRouteModel = { Template = AttributeRouteModel.CombineTemplates("/event", "{title:slugify}") }
+                    });
+                    mc.Selectors.Add(new SelectorModel(allSelectors[0])
+                    {
+                        AttributeRouteModel = { Template = AttributeRouteModel.CombineTemplates("/event/view", "{id}") }
+                    });
+                });
+            });
+
+            services.AddControllers();
+
+            services.AddSingleton<IEventService, EventService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

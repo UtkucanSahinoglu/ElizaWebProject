@@ -1,0 +1,55 @@
+﻿@page "{title}{id}"
+@model ViewEventModel
+@{
+    ViewData["Title"] = "View Event";
+}
+
+@if (Model.Event != null)
+{
+    <div class="row mb-4">
+        <div class="col-sm-12 col-xl-12">
+            <p class="h4 float-left text-muted">@Model.Event.Title</p>
+            <img class="float-right img-width rounded" src="@Model.Event.EventImage" alt="Event Image" />
+        </div>
+    </div>
+    <dl class="row">
+        <dt class="col-sm-3 d-font-medium">Description</dt>
+        <dd class="col-sm-9 d-font-13"><mark>@Model.Event.Body</mark></dd>
+
+        <dt class="col-sm-3 d-font-medium">Event Schedule</dt>
+        <dd class="col-sm-9">
+            <p class="d-font-13"><mark>@Model.Event.FormattedDate</mark></p>
+            <p class="d-font-13">Status: @Html.Raw(Model.Event.Status)</p>
+        </dd>
+
+        <dt class="col-sm-3 d-font-medium">Location</dt>
+        <dd class="col-sm-9 d-font-13"><mark>@Model.Event.Location</mark></dd>
+
+        <dt class="col-sm-3 d-font-medium text-truncate">Topic(s)</dt>
+        <dd class="col-sm-9 d-font-13"><mark>@(string.Join(", ", Model.Event.Topics.Select(q=> q.Value)))</mark></dd>
+
+        <dt class="col-sm-3 d-font-medium">Host</dt>
+        <dd class="col-sm-9 d-font-13">
+            <mark>@Model.Event.EventHost</mark> <span class="ml-2">More details can be found <a target="_blank" href="@Model.Event.WebSiteUrl">here</a>.</span>
+        </dd>
+        <dt class="col-sm-3 d-font-medium">Attendee(s)</dt>
+        <dd class="col-sm-9 d-font-13"><mark>@(string.Join(", ", Model.Event.Attendees))</mark></dd>
+    </dl>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-danger" role="alert">
+                No event found.
+            </div>
+        </div>
+    </div>
+}
+@section Scripts
+{
+    <script type="text/javascript">
+        if (document.getElementsByClassName("badge-pill").length > 0)
+            document.getElementsByClassName("badge-pill")[0].style.fontSize = '12px';
+    </script>
+}

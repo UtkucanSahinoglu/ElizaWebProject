@@ -1,0 +1,163 @@
+﻿@page
+@model AddEventModel
+@{
+    ViewData["Title"] = "Add Event";
+}
+<h4>Add Event</h4>
+<div class="row mt-2">
+    <div class="col-md-12">
+        @Html.ValidationSummary(true)
+        <form method="post">
+            <div class="form-group row">
+                <div class="col-sm-12 col-xl-12">
+                    <label for="EventModel_Title">Title</label>
+                    <textarea class="form-control" asp-for="@Model.EventModel.Title"></textarea>
+                    <small id="titleHelp" class="form-text text-muted">Title should be unique among all events and should not exceed more than 50 characters as well as special characters not allowed.</small>
+                    @Html.ValidationMessageFor(q => q.EventModel.Title)
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12 col-xl-12">
+                    <label for="EventModel_Description">Description</label>
+                    <textarea class="form-control" asp-for="@Model.EventModel.Description"></textarea>
+                    <small id="descriptionHelp" class="form-text text-muted">Description should be the detail information for the event</small>
+                    @Html.ValidationMessageFor(q => q.EventModel.Description)
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-6 col-xl-6">
+                    <label for="EventModel_Start">Start Date</label>
+                    <input class="form-control" type="text" asp-for="@Model.EventModel.Start" />
+                    <small id="startDateHelp" class="form-text text-muted">Event start date should be current date or may be in future.</small>
+                    @Html.ValidationMessageFor(q => q.EventModel.Start)
+                </div>
+                <div class="col-sm-6 col-xl-6">
+                    <label for="EventModel_End">End Date</label>
+                    <input type="text" class="form-control" asp-for="@Model.EventModel.End" />
+                    <small id="endDateHelp" class="form-text text-muted">Event end date should be greater or equal to the start date.</small>
+                    @Html.ValidationMessageFor(q => q.EventModel.End)
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-6 col-xl-6">
+                    <label for="EventModel_Host">Host</label>
+                    <input class="form-control" type="text" asp-for="@Model.EventModel.Host" />
+                    <small id="hostHelp" class="form-text text-muted">Company, institution or person specific which will orgnize the event.</small>
+                    @Html.ValidationMessageFor(q => q.EventModel.Host)
+                </div>
+                <div class="col-sm-6 col-xl-6">
+                    <label for="EventModel_WebsiteUrl">Site Url</label>
+                    <input type="text" class="form-control" asp-for="@Model.EventModel.WebsiteUrl" />
+                    <small id="websiteUrlHelp" class="form-text text-muted">Website url which may refer to get more insight about event title or host.</small>
+                    @Html.ValidationMessageFor(q => q.EventModel.WebsiteUrl)
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12 col-xl-12">
+                    <label for="EventModel_EventTopics">Event Topics</label>
+                    <textarea class="form-control" asp-for="@Model.EventModel.EventTopics"></textarea>
+                    <small id="eventTopicsHelp" class="form-text text-muted">Topic(s) should be comma(,) seprated values which will cover during the event.</small>
+                    @Html.ValidationMessageFor(q => q.EventModel.EventTopics)
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12 col-xl-12">
+                    <label for="EventModel_EventAttendees">Event Attendees</label>
+                    <textarea class="form-control" asp-for="@Model.EventModel.EventAttendees"></textarea>
+                    <small id="eventAttendeesHelp" class="form-text text-muted">For multiple attendees use comma(,) seprated names.</small>
+                    @Html.ValidationMessageFor(q => q.EventModel.EventAttendees)
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-6 col-xl-6">
+                    <label for="EventModel_EventMemo">Memorandum</label>
+                    <input class="form-control" type="text" asp-for="@Model.EventModel.EventMemo" />
+                    <small id="eventMemoHelp" class="form-text text-muted">A note recording something for future use.</small>
+                    @Html.ValidationMessageFor(q => q.EventModel.EventMemo)
+                </div>
+                <div class="col-sm-6 col-xl-6">
+                    <label for="EventModel_Location">Location</label>
+                    <input type="text" class="form-control" asp-for="@Model.EventModel.Location" />
+                    <small id="locationHelp" class="form-text text-muted">Location where the event will held.</small>
+                    @Html.ValidationMessageFor(q => q.EventModel.Location)
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-6 col-xl-6">
+                    <label for="EventModel_EventImage">Event Image</label><br />
+                    <img src="@Model.EventModel.EventImage" id="event-image" class="img-thumbnail img-width-1">
+                    <div class="file btn btn-info img-div">
+                        Upload
+                        <input type="file" name="upload-img" id="upload-img" class="img-input-file" />
+                    </div>
+                    <input type="hidden" asp-for="@Model.EventModel.EventImage" />
+                </div>
+                <div class="col-sm-6 col-xl-6">
+                    <label for="EventModel_Location">Event color on calendar</label>
+                    <input type="text" class="coloris" asp-for="@Model.EventModel.Color">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary float-right">Save</button>
+        </form>
+    </div>
+</div>
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial.cshtml">
+        <script src="~/js/coloris.min.js"></script>
+        <script type="text/javascript">
+        let validExtensions = ['jpg', 'png', 'jpeg'];
+        let imageDataUrl = "@Url.Content("api/appdata/getimagedata")";
+        Coloris({
+            el: '.coloris',
+            swatches: [
+                '#264653',
+                '#2a9d8f',
+                '#e9c46a',
+                '#f4a261',
+                '#e76f51',
+                '#d62828',
+                '#023e8a',
+                '#0077b6',
+                '#0096c7',
+                '#00b4d8',
+                '#48cae4',
+            ]
+        });
+        $(function () {
+            $('#EventModel_Start').datetimepicker({
+                format: 'd/m/Y',
+                minDate: true,
+                timepicker: false
+            });
+            $('#EventModel_End').datetimepicker({
+                format: 'd/m/Y',
+                minDate: true,
+                timepicker: false
+            });
+            $("#upload-img").change(function () {
+                var file = document.getElementById("upload-img").files[0];
+                if (validExtensions.findIndex((s) => { return s === file.name.split('.')[1] }) !== -1) {
+                    let fData = new FormData();
+                    fData.append("file", file);
+                    $.ajax({
+                        url: imageDataUrl,
+                        contentType: false,
+                        processData: false,
+                        method: 'POST',
+                        data: fData,
+                        success: function (r) {
+                            if (r.imageData !== "") {
+                                $("#event-image").attr("src", r.imageData);
+                                $("#EventModel_EventImage").val(r.imageData);
+                            }
+                        }
+                    });
+                } else {
+                    document.getElementById("upload-img").value = "";
+                    alert("Please select valid image file, Files are allowed jpg png and jpeg.");
+                }
+            });
+        });
+        </script>
+}

@@ -1,18 +1,183 @@
 ﻿@page
+@using System.Text.Json
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
 }
+<div class="text-left">
+    <h4 class="h-4 text-info">Events</h4>
+</div>
+<div class="row">
+    <div class="col-sm-4 col-xl-4 mb-1">
+        <div class="form-group">
+            <input id="datetimepicker" placeholder="From" class="form-control " type="text">
+        </div>
+    </div>
+    <div class="col-sm-4 col-xl-4 mb-1">
+        <div class="form-group">
+            <input id="datetimepicker1" placeholder="To" class="form-control" type="text">
+        </div>
 
-<div class="text-center">
-    <h1 class="display-4" style="font-weight:bold; color:blueviolet">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    </div>
+    <div class="col-sm-4 col-xl-4 mb-1">
+        <button type="button" onclick="getFilterSchedule()" class="btn-sm btn-info float-left">Search</button>
+        <button type="button" onclick="clearFilter()" class="btn-sm btn-info float-left ml-2">Clear Filter</button>
+        <button class="btn-custom active float-right ml-1"><i class="fa fa-bars"></i></button>
+        <button class="btn-custom float-right"><i class="fa fa-th-large"></i></button>
+    </div>
 </div>
 
-<style>
-    body {
-        background-image: url('../image/backimage.jpg');
-        background-size:cover;
-        background-repeat:no-repeat;
+<div class="row">
+    <div class="col-sm-8 col-xl-8">
+        <div class="div-cont" id="app-main">
+            <template v-if="events.length>0">
+                <div class="card-wrapper" v-for="e in events">
+                    <div class="float-left d-flex pr-2">
+                        <a class="anchr-icon mt-2" data-toggle="collapse" :href="'#collapseExample_' + e.id" role="button" aria-expanded="false" :aria-controls="'collapseExample_' + e.id"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="card shadow mb-3 bg-white rounded">
+                        <div class="card-body">
+                            <div class="card-title h7">{{e.formattedDate}} <div class="float-right" v-html="e.status"></div></div>
+                            <div class="card-text mb-1 h6"><a target="_blank" :href="e.webSiteUrl"><u>{{e.eventHost}}</u></a></div>
+                            <div class="card-text mb-2 h7">Topic(s): {{getTopics(e.topics)}}</div>
+                            <div class="collapse" :id="'collapseExample_' + e.id">
+                                <div class="row">
+                                    <div class="col-3">
+                                        <img :src="e.eventImage" class="rounded float-left img-width" alt="Image Text">
+                                    </div>
+                                    <div class="col-7 ml-5">
+                                        <div class="text-justify h6"><u>{{e.title}}</u></div>
+                                        <p class="text-justify">{{e.body}}</p>
+                                        <p class="text-justify">Venue: {{e.location}} <a target="_blank" class="btn btn-info float-right" :href="'/event/'+ e.slugTitle">View Event</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            <template v-else>
+                <div class="alert alert-success" role="alert">
+                    No events found.
+                </div>
+            </template>
+        </div>
+
+        <div class="div-cont d-none" id="cal-container">
+            <div class="code-html">
+                <div id="menu">
+                    <span id="menu-navi">
+                        <button type="button" class="btn btn-default btn-sm move-today" data-action="move-today">Today</button>
+                        <button type="button" class="btn btn-default btn-sm move-day" data-action="move-prev">
+                            <i class="calendar-icon ic-arrow-line-left" data-action="move-prev"></i>
+                        </button>
+                        <button type="button" class="btn btn-default btn-sm move-day" data-action="move-next">
+                            <i class="calendar-icon ic-arrow-line-right" data-action="move-next"></i>
+                        </button>
+                    </span>
+                    <span id="renderRange" class="render-range"></span>
+                </div>
+
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4 col-xl-4" id="app-upcoming">
+        <h4 class="text-info">Upcoming Events</h4>
+        <template v-if="upcomings.length>0">
+            <div class="card shadow p-3 mb-3 bg-white rounded" v-for="u in upcomings">
+                <img class="card-img-top" :src="u.eventImage" alt="Card image cap">
+                <div class="card-body">
+                    <p class="card-text upcoming-title mb-2">{{u.title}}</p>
+                    <p class="card-text h6 text-justify mb-1">{{u.body}}</p>
+                    <p><a target="_blank" class="btn btn-info float-right" :href="'/event/'+ u.slugTitle">View Event</a></p>
+                </div>
+            </div>
+        </template>
+        <template v-else>
+            <div class="alert alert-success" role="alert">
+                No events found.
+            </div>
+        </template>
+    </div>
+</div>
+
+
+@section Scripts
+{
+<script src="~/js/calendars.js"></script>
+<script src="~/js/schedules.js"></script>
+<script type="text/javascript">
+    CalendarList = @Html.Raw(JsonSerializer.Serialize(Model.Calendar.CalendarList, Model.SerializerOptions));
+    ScheduleList = @Html.Raw(JsonSerializer.Serialize(Model.Calendar.EventViewModels, Model.SerializerOptions));
+    let upcomings = @Html.Raw(JsonSerializer.Serialize(Model.Calendar.Upcomings, Model.SerializerOptions));
+    let eventsUrl = '@Url.Content("api/appdata/getevents")';
+    function swapIcon(el) {
+        el.find("i").hasClass("fa-plus") ?
+            el.find("i").removeClass("fa-plus").addClass("fa-minus") : el.find("i").removeClass("fa-minus").addClass("fa-plus");
     }
-</style>
+    var cal;
+    $(function () {
+        $(document).on("click", "a.anchr-icon", function () {
+            swapIcon($(this));
+        });
+        $("button.btn-custom").click(function () {
+            $("button.btn-custom").toggleClass("active");
+            $("div.div-cont").toggleClass("d-none");
+            cal.clear(); init();
+        });
+
+        $('#datetimepicker').datetimepicker({
+          format:'d/m/Y',
+          timepicker:false
+         });
+         $('#datetimepicker1').datetimepicker({
+          format:'d/m/Y',
+          timepicker:false
+         });
+    });
+    $('.collapse').on('shown.bs.collapse', function () {
+        let $anchor = $($(this).parent().parent().find("a.anchr-icon")[0]);
+        if ($anchor.find("i").hasClass("fa-plus"))
+            swapIcon($anchor);
+    });
+    $('.collapse').on('hidden.bs.collapse', function () {
+        let $anchor = $($(this).parent().parent().find("a.anchr-icon")[0]);
+        if ($anchor.find("i").hasClass("fa-minus"))
+            swapIcon($anchor);
+    });
+</script>
+<script type="text/javascript" class="code-js">
+    cal = new tui.Calendar('#calendar', {
+        defaultView: 'month',
+        useDetailPopup: true
+    });
+</script>
+<script src="~/js/default.js"></script>
+<script type="text/javascript">
+    let appMain = new Vue({
+      el: '#app-main',
+      data(){
+        return {
+            events: ScheduleList
+        }
+      },
+      methods:{
+        getFormat:function(d){
+         return moment(d).format('DD/MM/YYYY')
+        },
+        getTopics:function(d){
+          return d.length>0?$.map(d,function(d,e){ return d.value; }).join(', '):'';
+        }
+      }
+    });
+    let appUpcomings = new Vue({
+        el: '#app-upcoming',
+        data() {
+            return {
+                upcomings: upcomings
+            }
+        }
+    });
+</script>
+}
